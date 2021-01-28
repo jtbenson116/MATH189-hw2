@@ -1,0 +1,34 @@
+---
+title: "Math189_Homework02"
+output: html_document
+---
+```{r}
+# Read in the csv file 
+video_df <- read.csv('video_fixed.csv')
+# removes the last row (all NA values)
+video_df <- video_df[-nrow(video_df),]
+video_df
+```
+```{r}
+# Clean video multiple df
+#read in csv file
+video_multiple_df <- read.csv('video_multiple_fixed.csv')
+#sets first row as col names
+colnames(video_multiple_df) <- video_multiple_df[1,]
+#removes the first row
+video_multiple_df <- video_multiple_df[-1, ] 
+video_multiple_df
+```
+
+
+```{r}
+# Clean video_df
+video_df$like[video_df$like==99] <- NA
+video_df$where[video_df$where==99] <- NA
+video_df$freq[video_df$freq==99] <- NA
+video_df$busy[video_df$busy==99] <- NA
+video_df$educ[video_df$educ==99] <- NA
+video_df$math[video_df$math==99] <- NA
+video_df$work[video_df$work==99] <- NA
+video_df$cdrom[video_df$cdrom==99] <- NA
+```
