@@ -46,3 +46,14 @@ barplot(table(liked$grade),names.arg=c('C','B','A'),col = c('red','blue','green'
 
 ```
 
+```{r}
+educ1 = video_df[video_df$educ==1,]
+educ0 = video_df[video_df$educ==0,]
+   
+barplot(table(educ0$grade),names.arg=c('C','B','A'),col = c('red','blue','green') ,main= 'Distribution of Grades - Not Educational', border=TRUE,
+        xlab='Grade Expected', ylab='count')
+barplot(table(educ1$grade),names.arg=c('C','B','A'),col = c('red','blue','green') ,main= 'Distribution of Grades - Educational', border=TRUE,
+        xlab='Grade Expected', ylab='count')
+
+```
+
