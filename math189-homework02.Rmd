@@ -4,7 +4,7 @@ output: html_document
 ---
 ```{r}
 # Read in the csv file 
-video_df <- read.csv('video_fixed.csv')
+video_df <- read.csv('data/video_fixed.csv')
 # removes the last row (all NA values)
 video_df <- video_df[-nrow(video_df),]
 video_df
@@ -12,7 +12,7 @@ video_df
 ```{r}
 # Clean video multiple df
 #read in csv file
-video_multiple_df <- read.csv('video_multiple_fixed.csv')
+video_multiple_df <- read.csv('data/video_multiple_fixed.csv')
 #sets first row as col names
 colnames(video_multiple_df) <- video_multiple_df[1,]
 #removes the first row
@@ -31,6 +31,16 @@ video_df$educ[video_df$educ==99] <- NA
 video_df$math[video_df$math==99] <- NA
 video_df$work[video_df$work==99] <- NA
 video_df$cdrom[video_df$cdrom==99] <- NA
+```
+
+```{r}
+#SCENARIO 1
+played_videogames <- video_df$time
+played_videogames[played_videogames > 0] <- 1
+played_videogames
+
+t.test(played_videogames)
+
 ```
 
 ```{r}
