@@ -66,4 +66,3 @@ barplot(table(educ1$grade),names.arg=c('C','B','A'),col = c('red','blue','green'
         xlab='Grade Expected', ylab='count')
 
 ```
-
