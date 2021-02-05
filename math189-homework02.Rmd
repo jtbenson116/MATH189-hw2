@@ -1,0 +1,68 @@
+---
+title: "Math189_Homework02"
+output: html_document
+---
+```{r}
+# Read in the csv file 
+video_df <- read.csv('data/video_fixed.csv')
+# removes the last row (all NA values)
+video_df <- video_df[-nrow(video_df),]
+video_df
+```
+```{r}
+# Clean video multiple df
+#read in csv file
+video_multiple_df <- read.csv('data/video_multiple_fixed.csv')
+#sets first row as col names
+colnames(video_multiple_df) <- video_multiple_df[1,]
+#removes the first row
+video_multiple_df <- video_multiple_df[-1, ] 
+video_multiple_df
+```
+
+
+```{r}
+# Clean video_df
+video_df$like[video_df$like==99] <- NA
+video_df$where[video_df$where==99] <- NA
+video_df$freq[video_df$freq==99] <- NA
+video_df$busy[video_df$busy==99] <- NA
+video_df$educ[video_df$educ==99] <- NA
+video_df$math[video_df$math==99] <- NA
+video_df$work[video_df$work==99] <- NA
+video_df$cdrom[video_df$cdrom==99] <- NA
+```
+
+```{r}
+#SCENARIO 1
+played_videogames <- video_df$time
+played_videogames[played_videogames > 0] <- 1
+played_videogames
+
+t.test(played_videogames)
+
+```
+
+```{r}
+#SCENARIO 6
+#split into not played (5 and 1)
+not_liked = video_df[video_df$like == 1 | video_df$like == 5,]
+#split into played (2, 3, 4)
+liked = video_df[video_df$like==2|video_df$like==2|video_df$like==3,]
+barplot(table(not_liked$grade),names.arg=c('C','B','A'),col = c('red','blue','green') ,main= 'Distribution of Grades - Not Liked', border=TRUE,
+        xlab='Grade Expected', ylab='count')
+barplot(table(liked$grade),names.arg=c('C','B','A'),col = c('red','blue','green') ,main= 'Distribution of Grades - Liked', border=TRUE,
+        xlab='Grade Expected', ylab='count')
+
+```
+
+```{r}
+educ1 = video_df[video_df$educ==1,]
+educ0 = video_df[video_df$educ==0,]
+   
+barplot(table(educ0$grade),names.arg=c('C','B','A'),col = c('red','blue','green') ,main= 'Distribution of Grades - Not Educational', border=TRUE,
+        xlab='Grade Expected', ylab='count')
+barplot(table(educ1$grade),names.arg=c('C','B','A'),col = c('red','blue','green') ,main= 'Distribution of Grades - Educational', border=TRUE,
+        xlab='Grade Expected', ylab='count')
+
+```
