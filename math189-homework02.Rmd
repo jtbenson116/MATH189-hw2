@@ -20,7 +20,6 @@ video_multiple_df <- video_multiple_df[-1, ]
 video_multiple_df
 ```
 
-
 ```{r}
 # Clean video_df
 video_df$like[video_df$like==99] <- NA
@@ -39,7 +38,45 @@ played_videogames <- video_df$time
 played_videogames[played_videogames > 0] <- 1
 played_videogames
 
-t.test(played_videogames)
+# t.test(played_videogames)
+
+#BOOTSTRAPPING
+n <- 91
+N = 314
+ind.boot <- sample.int(n, size=N, replace=TRUE)
+played_videogames.boot <- played_videogames[ind.boot]
+B <- 2000
+boot.sample.mean <- rep(NA, B)
+for(i in 1:B){
+  ind <- sample.int(N, size=n, replace=TRUE)
+  boot <- played_videogames.boot[ind]
+  boot.sample.mean[i] <- mean(boot)
+  
+}
+
+mean(played_videogames)
+mean(boot.sample.mean)
+
+hist(boot.sample.mean)
+dev.copy(png,'graphs/scen1histogram.png')
+dev.off()
+qqline(boot.sample.mean)
+dev.copy(png,'graphs/scen1qqline.png')
+dev.off()
+
+```
+
+
+
+
+```{r}
+#SCENARIO 2
+video_df
+
+plot(video_df$time, video_df$freq)
+cor(video_df$time, video_df$freq, use = "complete.obs")
+## Too low to mean anything
+## result of bias to the data as asked about playing video games the week before a midterm. 
 
 ```
 
