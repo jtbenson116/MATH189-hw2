@@ -2,6 +2,9 @@
 title: "Math189_Homework02"
 output: html_document
 ---
+
+# TO-DO: Change all var names with - to .
+
 ```{r}
 # Read in the csv file 
 video_df <- read.csv('data/video_fixed.csv')
@@ -34,9 +37,9 @@ video_df$cdrom[video_df$cdrom==99] <- NA
 
 ```{r}
 #SCENARIO 1
-played_videogames <- video_df$time
-played_videogames[played_videogames > 0] <- 1
-played_videogames
+played.videogames <- video_df$time
+played.videogames[played.videogames > 0] <- 1
+played.videogames
 
 # t.test(played_videogames)
 
@@ -44,23 +47,41 @@ played_videogames
 n <- 91
 N = 314
 ind.boot <- sample.int(n, size=N, replace=TRUE)
-played_videogames.boot <- played_videogames[ind.boot]
+boot.played.videogames <- played.videogames[ind.boot]
 B <- 2000
-boot.sample.mean <- rep(NA, B)
+boot.played.videogames.mean <- rep(NA, B)
 for(i in 1:B){
   ind <- sample.int(N, size=n, replace=TRUE)
-  boot <- played_videogames.boot[ind]
-  boot.sample.mean[i] <- mean(boot)
+  boot <- boot.played.videogames[ind]
+  boot.played.videogames.mean[i] <- mean(boot)
   
 }
+# Fraction of kids that played video games the week before the test
+sample.mean <- mean(played.videogames)
+sample.mean
 
-mean(played_videogames)
-mean(boot.sample.mean)
+# Estimate of fraction of kids that played vgs before the test using bootstrap
+bootstrap.mean <- mean(boot.played.videogames.mean)
+bootstrap.mean
 
-hist(boot.sample.mean)
+# Confidence Interval (Bootstrap Sample Means)
+boot.played.videogames.sd <- sd(boot.played.videogames.mean)
+boot.played.videogames.sd
+boot.played.videogames.ci <- c(bootstrap.mean - 1.96*boot.played.videogames.sd, bootstrap.mean + + 1.96*boot.played.videogames.sd)
+# Confidence Interval = 95% (Where z = 1.96)
+boot.played.videogames.ci
+
+# 0.025-quantile and 0.975 quantile of the bootstrap sample means (Interval Estimate)
+boot.played.videogames.qqi <- c(quantile(bootstrap.mean, 0.025), quantile(bootstrap.mean, 0.975))
+boot.played.videogames.qqi
+
+
+# Histrogram and QQ Plot Generations
+hist(boot.played.videogames.mean, main="Played Video Games Mean Bootstrap Histogram", xlab="Bootstrap Sample Mean")
 dev.copy(png,'graphs/scen1histogram.png')
 dev.off()
-qqline(boot.sample.mean)
+qqnorm(boot.played.videogames.mean, main="Played Video Games Mean Bootstrap QQ Plot")
+qqline(boot.played.videogames.mean)
 dev.copy(png,'graphs/scen1qqline.png')
 dev.off()
 
