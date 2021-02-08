@@ -42,6 +42,7 @@ played_videogames
 t.test(played_videogames)
 
 ```
+
 ```{r}
 #SCENARIO 3
 #point estimate for mean of time 
@@ -52,9 +53,10 @@ width <- 1.96 *sd(video_df$time)* sqrt((314-91)/((91)*314))
 int.time <- c(mean.time - width, mean.time + width)
 int.time
 #Distribution of time
-hist(video_df$time)
+hist(video_df$time,breaks = 20, probability = TRUE, density = 40, col = 7, border = 3)
+lines(density(video_df$time, adjust = 2),lwd=2, col = 2)
 qqnorm(video_df$time)
-qqline(video_df$time)
+qqline(video_df$time,lwd=2, col=2)
 #constructing bootstrap estimate
 #creating bootstrap population
 ind.boot <- sample.int(91, size=314, replace=TRUE)
@@ -68,13 +70,15 @@ for(i in 1:B){
   boot.sample.mean[i] <- mean(boot)
 }
 #Distribution of bootstrap sample means 
-hist(boot.sample.mean)
+hist(boot.sample.mean,breaks = 20, probability = TRUE, density = 40, col = 7, border = 3)
+lines(density(boot.sample.mean, adjust = 2),lwd=2, col = 2)
 qqnorm(boot.sample.mean)
-qqline(boot.sample.mean)
+qqline(boot.sample.mean,lwd=2, col=2)
 #constructing confidence interval using bootstrap means
 time.mean.boot <- mean(boot.sample.mean)
 time.int.boot <- c(time.mean.boot - 1.96*sd(boot.sample.mean), time.mean.boot + 1.96*sd(boot.sample.mean))
 time.int.boot
+
 ```
 
 ```{r}
