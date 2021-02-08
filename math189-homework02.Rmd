@@ -35,11 +35,16 @@ video_df$cdrom[video_df$cdrom==99] <- NA
 
 ```{r}
 #SCENARIO 1
-played_videogames <- video_df$time
-played_videogames[played_videogames > 0] <- 1
-played_videogames
-
-t.test(played_videogames)
+played.videogames <- video_df$time
+played.videogames[played.videogames > 0] <- 1
+played.mean <-mean(played.videogames)
+#showing mean of binary variable is equivalent to (#ofstudentsthatplayed)/(#ofstudents) 
+played <- as.double(table(played.videogames[played.videogames==1]))
+played/91==played.mean
+#Confidence interval for discrete var "played.videogames" with finite population correction
+width <- 1.96 * sqrt(played.mean*(1-played.mean)*(314-91)/((91-1)*314))
+int.played <- c(played.mean - width, played.mean + width)
+int.played
 
 ```
 
