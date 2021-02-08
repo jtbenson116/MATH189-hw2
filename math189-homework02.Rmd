@@ -43,6 +43,41 @@ t.test(played_videogames)
 
 ```
 ```{r}
+#SCENARIO 3
+#point estimate for mean of time 
+mean.time <- mean(video_df$time)
+mean.time
+#constructing confidence interval for mean of time, continuous variable 
+width <- 1.96 *sd(video_df$time)* sqrt((314-91)/((91)*314))
+int.time <- c(mean.time - width, mean.time + width)
+int.time
+#Distribution of time
+hist(video_df$time)
+qqnorm(video_df$time)
+qqline(video_df$time)
+#constructing bootstrap estimate
+#creating bootstrap population
+ind.boot <- sample.int(91, size=314, replace=TRUE)
+time.boot <- video_df$time[ind.boot]
+#generating bootstrap sample means
+B <- 2000
+boot.sample.mean <- rep(NA, B)
+for(i in 1:B){
+  ind <- sample.int(314, size=91, replace=FALSE)
+  boot <- time.boot[ind]
+  boot.sample.mean[i] <- mean(boot)
+}
+#Distribution of bootstrap sample means 
+hist(boot.sample.mean)
+qqnorm(boot.sample.mean)
+qqline(boot.sample.mean)
+#constructing confidence interval using bootstrap means
+time.mean.boot <- mean(boot.sample.mean)
+time.int.boot <- c(time.mean.boot - 1.96*sd(boot.sample.mean), time.mean.boot + 1.96*sd(boot.sample.mean))
+time.int.boot
+```
+
+```{r}
 #SCENARIO 4
 #creates table for like varible
 likeAlone <- table(video_df$like)
