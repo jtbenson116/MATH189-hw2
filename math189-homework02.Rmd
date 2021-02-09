@@ -54,12 +54,12 @@ ind.boot <- sample.int(n, size=N, replace=TRUE)
 boot.played.videogames <- played.videogames[ind.boot]
 B <- 2000
 boot.played.videogames.mean <- rep(NA, B)
-for(i in 1:B){
-  ind <- sample.int(N, size=n, replace=TRUE)
-  boot <- boot.played.videogames[ind]
-  boot.played.videogames.mean[i] <- mean(boot)
-  
+for(i in 1:B) {
+        ind <- sample.int(N, size=n, replace=TRUE)
+        boot <- boot.played.videogames[ind]
+        boot.played.videogames.mean[i] <- mean(boot)
 }
+
 # Fraction of kids that played video games the week before the test
 sample.mean <- mean(played.videogames)
 sample.mean
@@ -69,6 +69,7 @@ bootstrap.mean
 # Confidence Interval (Bootstrap Sample Means)
 boot.played.videogames.sd <- sd(boot.played.videogames.mean)
 boot.played.videogames.sd
+
 boot.played.videogames.ci <- c(bootstrap.mean - 1.96*boot.played.videogames.sd, bootstrap.mean + + 1.96*boot.played.videogames.sd)
 # Confidence Interval = 95% (Where z = 1.96)
 boot.played.videogames.ci
@@ -76,6 +77,11 @@ boot.played.videogames.ci
 # 0.025-quantile and 0.975 quantile of the bootstrap sample means (Interval Estimate)
 boot.played.videogames.qqi <- c(quantile(bootstrap.mean, 0.025), quantile(bootstrap.mean, 0.975))
 boot.played.videogames.qqi
+
+
+# Create directory to save graphs 
+dir.create(file.path("graphs"), showWarnings = FALSE)
+
 
 # Histrogram and QQ Plot Generations
 hist(boot.played.videogames.mean, main="Played Video Games Mean Bootstrap Histogram", xlab="Bootstrap Sample Mean")
@@ -85,11 +91,21 @@ qqnorm(boot.played.videogames.mean, main="Played Video Games Mean Bootstrap QQ P
 qqline(boot.played.videogames.mean)
 dev.copy(png,'graphs/scen1qqline.png')
 dev.off()
+```
+
 
 ```{r}
 #SCENARIO 2
+#video_df$freq[video_df$freq==99] <- NA
 video_df
-plot(video_df$time, video_df$freq)
+
+
+plot(video_df$time, video_df$freq, main="Time Played and Frequency Played Video Games Scatterplot", 
+        xlab="Amount of Hours Played Video Games Last Week", ylab="Frequency Play Video Games", yaxt="n")
+axis(2, at=1:4, labels=list("Daily", "Weekly", "Monthly", "Semesterly"))
+dev.copy(png,'graphs/scen2scatter.png')
+dev.off()
+
 cor(video_df$time, video_df$freq, use = "complete.obs")
 ## Too low to mean anything
 ## result of bias to the data as asked about playing video games the week before a midterm. 
