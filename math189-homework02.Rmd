@@ -126,8 +126,10 @@ hist(boot.sample.mean,breaks = 20, probability = TRUE, density = 40, col = 7, bo
 lines(density(boot.sample.mean, adjust = 2),lwd=2, col = 2)
 qqnorm(boot.sample.mean)
 qqline(boot.sample.mean,lwd=2, col=2)
-#constructing confidence interval using bootstrap means
+#point estimate for mean from bootstrap 
 time.mean.boot <- mean(boot.sample.mean)
+time.mean.boot
+#constructing confidence interval using bootstrap means
 time.int.boot <- c(time.mean.boot - 1.96*sd(boot.sample.mean), time.mean.boot + 1.96*sd(boot.sample.mean))
 time.int.boot
 
