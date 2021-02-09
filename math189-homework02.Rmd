@@ -76,6 +76,8 @@ boot.played.videogames.ci
 boot.played.videogames.qqi <- c(quantile(bootstrap.mean, 0.025), quantile(bootstrap.mean, 0.975))
 boot.played.videogames.qqi
 
+# Create directory to save graphs 
+dir.create(file.path("graphs"), showWarnings = FALSE)
 
 # Histrogram and QQ Plot Generations
 hist(boot.played.videogames.mean, main="Played Video Games Mean Bootstrap Histogram", xlab="Bootstrap Sample Mean")
