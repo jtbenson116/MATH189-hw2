@@ -39,10 +39,14 @@ video_df$cdrom[video_df$cdrom==99] <- NA
 #SCENARIO 1
 played.videogames <- video_df$time
 played.videogames[played.videogames > 0] <- 1
-played.videogames
-
-# t.test(played_videogames)
-
+played.mean <-mean(played.videogames)
+#showing mean of binary variable is equivalent to (#ofstudentsthatplayed)/(#ofstudents) 
+played <- as.double(table(played.videogames[played.videogames==1]))
+played/91==played.mean
+#Confidence interval for discrete var "played.videogames" with finite population correction
+width <- 1.96 * sqrt(played.mean*(1-played.mean)*(314-91)/((91-1)*314))
+int.played <- c(played.mean - width, played.mean + width)
+int.played
 #BOOTSTRAPPING
 n <- 91
 N = 314
@@ -59,11 +63,9 @@ for(i in 1:B) {
 # Fraction of kids that played video games the week before the test
 sample.mean <- mean(played.videogames)
 sample.mean
-
 # Estimate of fraction of kids that played vgs before the test using bootstrap
 bootstrap.mean <- mean(boot.played.videogames.mean)
 bootstrap.mean
-
 # Confidence Interval (Bootstrap Sample Means)
 boot.played.videogames.sd <- sd(boot.played.videogames.mean)
 boot.played.videogames.sd
@@ -76,8 +78,10 @@ boot.played.videogames.ci
 boot.played.videogames.qqi <- c(quantile(bootstrap.mean, 0.025), quantile(bootstrap.mean, 0.975))
 boot.played.videogames.qqi
 
+
 # Create directory to save graphs 
 dir.create(file.path("graphs"), showWarnings = FALSE)
+
 
 # Histrogram and QQ Plot Generations
 hist(boot.played.videogames.mean, main="Played Video Games Mean Bootstrap Histogram", xlab="Bootstrap Sample Mean")
@@ -89,20 +93,114 @@ dev.copy(png,'graphs/scen1qqline.png')
 dev.off()
 ```
 
+
 ```{r}
 #SCENARIO 2
 #video_df$freq[video_df$freq==99] <- NA
 video_df
+
 
 plot(video_df$time, video_df$freq, main="Time Played and Frequency Played Video Games Scatterplot", 
         xlab="Amount of Hours Played Video Games Last Week", ylab="Frequency Play Video Games", yaxt="n")
 axis(2, at=1:4, labels=list("Daily", "Weekly", "Monthly", "Semesterly"))
 dev.copy(png,'graphs/scen2scatter.png')
 dev.off()
+
 cor(video_df$time, video_df$freq, use = "complete.obs")
 ## Too low to mean anything
 ## result of bias to the data as asked about playing video games the week before a midterm. 
+```
 
+```{r}
+#SCENARIO 3
+#point estimate for mean of time 
+mean.time <- mean(video_df$time)
+mean.time
+#constructing confidence interval for mean of time, continuous variable 
+width <- 1.96 *sd(video_df$time)* sqrt((314-91)/((91)*314))
+int.time <- c(mean.time - width, mean.time + width)
+int.time
+#Distribution of time
+hist(video_df$time,breaks = 20, probability = TRUE, density = 40, col = 7, border = 3)
+lines(density(video_df$time, adjust = 2),lwd=2, col = 2)
+qqnorm(video_df$time)
+qqline(video_df$time,lwd=2, col=2)
+#constructing bootstrap estimate
+#creating bootstrap population
+ind.boot <- sample.int(91, size=314, replace=TRUE)
+time.boot <- video_df$time[ind.boot]
+#generating bootstrap sample means
+B <- 2000
+boot.sample.mean <- rep(NA, B)
+for(i in 1:B){
+  ind <- sample.int(314, size=91, replace=FALSE)
+  boot <- time.boot[ind]
+  boot.sample.mean[i] <- mean(boot)
+}
+#Distribution of bootstrap sample means 
+hist(boot.sample.mean,breaks = 20, probability = TRUE, density = 40, col = 7, border = 3)
+lines(density(boot.sample.mean, adjust = 2),lwd=2, col = 2)
+qqnorm(boot.sample.mean)
+qqline(boot.sample.mean,lwd=2, col=2)
+#constructing confidence interval using bootstrap means
+time.mean.boot <- mean(boot.sample.mean)
+time.int.boot <- c(time.mean.boot - 1.96*sd(boot.sample.mean), time.mean.boot + 1.96*sd(boot.sample.mean))
+time.int.boot
+
+```
+
+```{r}
+#SCENARIO 4
+#creates table for like varible
+likeAlone <- table(video_df$like)
+#Below adds instances where like = 1 or 5
+noGames <- as.double(likeAlone[1]+likeAlone[5])
+#portion of surveyees who never played/don't like playing video games at all
+noGames/nrow(video_df)
+#instances of "relax" reason for playing video games
+relax <- as.double(table(video_multiple_df$relax[video_multiple_df$relax==1]))
+#instances of "grahics" reason for playing video games
+graphics <- as.double(table(video_multiple_df$graphic[video_multiple_df$graphic==1]))
+#instances of "master" reason for playing video games
+master <- as.double(table(video_multiple_df$master[video_multiple_df$master==1]))
+#instances of "bored" reason for playing video games
+bored <- as.double(table(video_multiple_df$bored[video_multiple_df$bored==1]))
+#instances of "challenge" reason for playing video games
+challenge <- as.double(table(video_multiple_df$challenge[video_multiple_df$challenge==1]))
+#instances of "coordination" reason for playing video games
+coord <- as.double(table(video_multiple_df$coord[video_multiple_df$coord==1]))
+#creates vector of each reason instance
+reasons <- c(relax,graphics,master,bored,challenge,coord)
+#attaches reason name to each instance sum
+names(reasons) <- c("relax","graphics","master","bored","challenge","coord")
+#sorted display of the reasons and summed instances
+sort(reasons, decreasing = TRUE)
+
+#Below we see find the most prominent reasons why students don't like vdgm.'s
+#instances of "time" reason for not playing video games
+time <- as.double(table(video_multiple_df$time[video_multiple_df$time==1]))
+#instances of "frust" reason for playing video games
+frust <- as.double(table(video_multiple_df$frust[video_multiple_df$frust==1]))
+#instances of "lonely" reason for playing video games
+lonely <- as.double(table(video_multiple_df$lonely[video_multiple_df$lonely==1]))
+#instances of "rules" reason for playing video games
+rules <- as.double(table(video_multiple_df$rules[video_multiple_df$rules==1]))
+#instances of "cost" reason for playing video games
+cost <- as.double(table(video_multiple_df$cost[video_multiple_df$cost==1]))
+#instances of "boring" reason for playing video games
+boring <- as.double(table(video_multiple_df$boring[video_multiple_df$boring==1]))
+#instances of "friends don't play" reason for playing video games
+friends <- as.double(table(video_multiple_df$friends[video_multiple_df$friends==1]))
+#instances of "pointless" reason for playing video games
+pointless <- as.double(table(video_multiple_df$point[video_multiple_df$point==1]))
+
+
+#creates vector of each dislike reason instance
+dislikeReasons <- c(time,frust,lonely,rules,cost,boring, friends,pointless)
+#attaches reason name to each instance sum
+names(dislikeReasons) <- c("time","frust","lonely","rules","cost","boring","friends","pointless")
+#sorted display of the reasons and summed instances
+sort(dislikeReasons, decreasing = TRUE)
 ```
 
 ```{r}
