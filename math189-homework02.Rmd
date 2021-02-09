@@ -83,6 +83,15 @@ dev.copy(png,'graphs/scen1qqline.png')
 dev.off()
 
 ```
+```{r}
+#SCENARIO 2
+video_df
+plot(video_df$time, video_df$freq)
+cor(video_df$time, video_df$freq, use = "complete.obs")
+## Too low to mean anything
+## result of bias to the data as asked about playing video games the week before a midterm. 
+```
+
 
 ```{r}
 #SCENARIO 3
