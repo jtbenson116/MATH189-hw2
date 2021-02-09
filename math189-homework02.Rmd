@@ -60,6 +60,7 @@ for(i in 1:B) {
         boot.played.videogames.mean[i] <- mean(boot)
 }
 
+
 # Fraction of kids that played video games the week before the test
 sample.mean <- mean(played.videogames)
 sample.mean
@@ -70,7 +71,7 @@ bootstrap.mean
 boot.played.videogames.sd <- sd(boot.played.videogames.mean)
 boot.played.videogames.sd
 
-boot.played.videogames.ci <- c(bootstrap.mean - 1.96*boot.played.videogames.sd, bootstrap.mean + + 1.96*boot.played.videogames.sd)
+boot.played.videogames.ci <- c(bootstrap.mean - 1.96*boot.played.videogames.sd, bootstrap.mean + 1.96*boot.played.videogames.sd)
 # Confidence Interval = 95% (Where z = 1.96)
 boot.played.videogames.ci
 
@@ -78,15 +79,22 @@ boot.played.videogames.ci
 boot.played.videogames.qqi <- c(quantile(bootstrap.mean, 0.025), quantile(bootstrap.mean, 0.975))
 boot.played.videogames.qqi
 
+# Check Normality by  Kolmogorov-Smirnov test [Lab 3]
+# ks.test((boot.mean - mean(boot.mean))/sd(boot.mean), pnorm)
+ks.test(((boot.played.videogames.mean - bootstrap.mean)/boot.played.videogames.sd), pnorm)
 
 # Create directory to save graphs 
 dir.create(file.path("graphs"), showWarnings = FALSE)
 
 
-# Histrogram and QQ Plot Generations
+# Histrogram Plot Generation
 hist(boot.played.videogames.mean, main="Played Video Games Mean Bootstrap Histogram", xlab="Bootstrap Sample Mean")
+# add lines for bootsrap CI
+abline(v=boot.played.videogames.ci[1])
+abline(v=boot.played.videogames.ci[2])
 dev.copy(png,'graphs/scen1histogram.png')
 dev.off()
+# QQ Plot Generations
 qqnorm(boot.played.videogames.mean, main="Played Video Games Mean Bootstrap QQ Plot")
 qqline(boot.played.videogames.mean)
 dev.copy(png,'graphs/scen1qqline.png')
@@ -96,7 +104,8 @@ dev.off()
 
 ```{r}
 #SCENARIO 2
-#video_df$freq[video_df$freq==99] <- NA
+# video_df$freq[video_df$freq==99] <- NA
+# col=brewer.pal(n = 3, name = "RdBu")
 video_df
 
 
@@ -107,8 +116,32 @@ dev.copy(png,'graphs/scen2scatter.png')
 dev.off()
 
 cor(video_df$time, video_df$freq, use = "complete.obs")
+
 ## Too low to mean anything
 ## result of bias to the data as asked about playing video games the week before a midterm. 
+
+
+
+#barplots to show sample distrubitions of hours played last week grouped by frequency played games
+#Axis names needed!!!
+barplot(with(video_df, table(freq[video_df$freq==1], time[video_df$freq==1])), col="red")
+barplot(with(video_df, table(freq[video_df$freq==2], time[video_df$freq==2])), col="blue")
+barplot(with(video_df, table(freq[video_df$freq==3], time[video_df$freq==3])), col="orange")
+barplot(with(video_df, table(freq[video_df$freq==4], time[video_df$freq==4])), col="green",)
+
+time.means.by.freq <- matrix(c(mean(video_df$time[video_df$freq==1], na.rm=TRUE),
+        mean(video_df$time[video_df$freq==2], na.rm=TRUE),
+        mean(video_df$time[video_df$freq==3], na.rm=TRUE),
+        mean(video_df$time[video_df$freq==4], na.rm=TRUE)),
+        ncol=4,byrow=TRUE)
+colnames(time.means.by.freq) <- c("Daily", "Weekly", "Monthly", "Semesterly")
+rownames(time.means.by.freq) <- c("Mean Time Played")
+time.means.by.freq <- as.table(time.means.by.freq)
+time.means.by.freq
+barplot(time.means.by.freq, col=c("red", "blue", "orange", "green"))
+# FIX COLORS
+# ADD MEAN NUMBERS ON TOP
+# text(x,y+2,labels=as.character(y))
 ```
 
 ```{r}
@@ -217,6 +250,7 @@ barplot(table(liked$grade),names.arg=c('C','B','A'),col = c('red','blue','green'
 ```
 
 ```{r}
+#INDEP SCENARIO
 educ1 = video_df[video_df$educ==1,]
 educ0 = video_df[video_df$educ==0,]
    
