@@ -1,0 +1,345 @@
+---
+title: "Math189_Homework02"
+output: html_document
+---
+
+# TO-DO: Change all var names with - to .
+
+```{r}
+# Read in the csv file 
+video_df <- read.csv('data/video_fixed.csv')
+# removes the last row (all NA values)
+video_df <- video_df[-nrow(video_df),]
+```
+
+```{r}
+# Clean video multiple df
+#read in csv file
+video_multiple_df <- read.csv('data/video_multiple_fixed.csv')
+#sets first row as col names
+colnames(video_multiple_df) <- video_multiple_df[1,]
+#removes the first row
+video_multiple_df <- video_multiple_df[-1, ]
+#reset index
+rownames(video_multiple_df) <- c(1:nrow(video_multiple_df))
+```
+
+```{r}
+# Clean video_df
+video_df$like[video_df$like==99] <- NA
+video_df$where[video_df$where==99] <- NA
+video_df$freq[video_df$freq==99] <- NA
+video_df$busy[video_df$busy==99] <- NA
+video_df$educ[video_df$educ==99] <- NA
+video_df$math[video_df$math==99] <- NA
+video_df$work[video_df$work==99] <- NA
+video_df$cdrom[video_df$cdrom==99] <- NA
+```
+
+```{r}
+#SCENARIO 1
+played.videogames <- video_df$time
+played.videogames[played.videogames > 0] <- 1
+played.mean <-mean(played.videogames)
+#showing mean of binary variable is equivalent to (#ofstudentsthatplayed)/(#ofstudents) 
+played <- as.double(table(played.videogames[played.videogames==1]))
+played/91==played.mean
+#Confidence interval for discrete var "played.videogames" with finite population correction
+width <- 1.96 * sqrt(played.mean*(1-played.mean)*(314-91)/((91-1)*314))
+int.played <- c(played.mean - width, played.mean + width)
+int.played
+#BOOTSTRAPPING
+n <- 91
+N = 314
+ind.boot <- sample.int(n, size=N, replace=TRUE)
+boot.played.videogames <- played.videogames[ind.boot]
+B <- 2000
+boot.played.videogames.mean <- rep(NA, B)
+for(i in 1:B) {
+        ind <- sample.int(N, size=n, replace=TRUE)
+        boot <- boot.played.videogames[ind]
+        boot.played.videogames.mean[i] <- mean(boot)
+}
+
+
+# Fraction of kids that played video games the week before the test
+sample.mean <- mean(played.videogames)
+sample.mean
+# Estimate of fraction of kids that played vgs before the test using bootstrap
+bootstrap.mean <- mean(boot.played.videogames.mean)
+bootstrap.mean
+# Confidence Interval (Bootstrap Sample Means)
+boot.played.videogames.sd <- sd(boot.played.videogames.mean)
+boot.played.videogames.sd
+
+boot.played.videogames.ci <- c(bootstrap.mean - 1.96*boot.played.videogames.sd, bootstrap.mean + 1.96*boot.played.videogames.sd)
+# Confidence Interval = 95% (Where z = 1.96)
+boot.played.videogames.ci
+
+# 0.025-quantile and 0.975 quantile of the bootstrap sample means (Interval Estimate)
+boot.played.videogames.qqi <- c(quantile(bootstrap.mean, 0.025), quantile(bootstrap.mean, 0.975))
+boot.played.videogames.qqi
+
+# Check Normality by  Kolmogorov-Smirnov test [Lab 3]
+# ks.test((boot.mean - mean(boot.mean))/sd(boot.mean), pnorm)
+ks.test(((boot.played.videogames.mean - bootstrap.mean)/boot.played.videogames.sd), pnorm)
+
+# Create directory to save graphs 
+dir.create(file.path("graphs"), showWarnings = FALSE)
+
+
+# Histrogram Plot Generation
+hist(boot.played.videogames.mean, main="Played Video Games Mean Bootstrap Histogram", xlab="Bootstrap Sample Mean")
+# add lines for bootsrap CI
+abline(v=boot.played.videogames.ci[1])
+abline(v=boot.played.videogames.ci[2])
+dev.copy(png,'graphs/scen1histogram.png')
+dev.off()
+# QQ Plot Generations
+qqnorm(boot.played.videogames.mean, main="Played Video Games Mean Bootstrap QQ Plot")
+qqline(boot.played.videogames.mean)
+dev.copy(png,'graphs/scen1qqline.png')
+dev.off()
+
+#jackknife
+jack.means = rep(NA, n)
+for (i in seq(1,n,1)) {
+  jack.means[i] = mean(played.videogames[-i])
+}
+jack.mu = mean(jack.means)
+jack.sd = sd(jack.means)
+jack.int = c(jack.mu - 1.96*jack.sd, jack.mu + 1.96*jack.sd)
+#histogram of jackknife CI on sample data
+hist(played.videogames, main='jackknife 95% confidence interval on sample data')
+abline(v=jack.int[1],lwd=2,col='red')
+abline(v=jack.int[2],lwd=2,col='blue')
+#histogram of bootstrap CI on sample data
+hist(played.videogames, main='bootstrap 95% confidence interval on sample data')
+abline(v=boot.played.videogames.ci[1], lwd=2, col='red')
+abline(v=boot.played.videogames.ci[2], lwd=2, col='blue')
+```
+
+
+```{r}
+#SCENARIO 2
+# video_df$freq[video_df$freq==99] <- NA
+# col=brewer.pal(n = 3, name = "RdBu")
+plot(video_df$time, video_df$freq, main="Time Played and Frequency Played Video Games Scatterplot", 
+        xlab="Amount of Hours Played Video Games Last Week", ylab="Frequency Play Video Games", yaxt="n")
+axis(2, at=1:4, labels=list("Daily", "Weekly", "Monthly", "Semesterly"))
+dev.copy(png,'graphs/scen2scatter.png')
+dev.off()
+
+cor(video_df$time, video_df$freq, use = "complete.obs")
+
+## Too low to mean anything
+## result of bias to the data as asked about playing video games the week before a midterm. 
+
+
+
+#barplots to show sample distrubitions of hours played last week grouped by frequency played games
+#Axis names needed!!!
+barplot(with(video_df, table(freq[video_df$freq==1], time[video_df$freq==1])), col="red",xlab='time (hours last week)',ylab='number of students',main='hours spent playing VGs by students that play daily')
+barplot(with(video_df, table(freq[video_df$freq==2], time[video_df$freq==2])), col="blue",xlab='time (hours last week)',ylab='number of students',main='hours spent playing VGs by students that play weekly')
+barplot(with(video_df, table(freq[video_df$freq==3], time[video_df$freq==3])), col="orange",xlab='time (hours last week)',ylab='number of students',main='hours spent playing VGs by students that play monthly')
+barplot(with(video_df, table(freq[video_df$freq==4], time[video_df$freq==4])), col="green",xlab='time (hours last week)',ylab='number of students',main='hours spent playing VGs by students that play semesterly')
+
+time.means.by.freq <- matrix(c(mean(video_df$time[video_df$freq==1], na.rm=TRUE),
+        mean(video_df$time[video_df$freq==2], na.rm=TRUE),
+        mean(video_df$time[video_df$freq==3], na.rm=TRUE),
+        mean(video_df$time[video_df$freq==4], na.rm=TRUE)),
+        ncol=4,byrow=TRUE)
+colnames(time.means.by.freq) <- c("Daily", "Weekly", "Monthly", "Semesterly")
+rownames(time.means.by.freq) <- c("Mean Time Played")
+time.means.by.freq <- as.table(time.means.by.freq)
+time.means.by.freq
+barplot(time.means.by.freq, col=c("red", "blue", "orange", "green"),xlab='playtime frequency',ylab='average playtime (hours)',main='average playtime for each frequency of play')
+# FIX COLORS
+# ADD MEAN NUMBERS ON TOP
+# text(x,y+2,labels=as.character(y))
+```
+
+```{r}
+#SCENARIO 3
+#point estimate for mean of time 
+mean.time <- mean(video_df$time)
+mean.time
+#constructing confidence interval for mean of time, continuous variable 
+width <- 1.96 *sd(video_df$time)* sqrt((314-91)/((91)*314))
+int.time <- c(mean.time - width, mean.time + width)
+int.time
+#Distribution of time
+hist(video_df$time,breaks = 20, probability = TRUE, density = 40, col = 7, border = 3)
+lines(density(video_df$time, adjust = 2),lwd=2, col = 2)
+qqnorm(video_df$time)
+qqline(video_df$time,lwd=2, col=2)
+#constructing bootstrap estimate
+#creating bootstrap population
+ind.boot <- sample.int(91, size=314, replace=TRUE)
+time.boot <- video_df$time[ind.boot]
+#generating bootstrap sample means
+B <- 2000
+boot.sample.mean <- rep(NA, B)
+for(i in 1:B){
+  ind <- sample.int(314, size=91, replace=FALSE)
+  boot <- time.boot[ind]
+  boot.sample.mean[i] <- mean(boot)
+}
+#Distribution of bootstrap sample means 
+hist(boot.sample.mean,breaks = 20, probability = TRUE, density = 40, col = 7, border = 3)
+lines(density(boot.sample.mean, adjust = 2),lwd=2, col = 2)
+qqnorm(boot.sample.mean)
+qqline(boot.sample.mean,lwd=2, col=2)
+#constructing confidence interval using bootstrap means
+time.mean.boot <- mean(boot.sample.mean)
+time.int.boot <- c(time.mean.boot - 1.96*sd(boot.sample.mean), time.mean.boot + 1.96*sd(boot.sample.mean))
+time.int.boot
+
+```
+
+```{r}
+#SCENARIO 4
+#creates table for like varible
+likeAlone <- table(video_df$like)
+#Below adds instances where like = 1 or 5
+noGames <- as.double(likeAlone[1]+likeAlone[5])
+#portion of surveyees who never played/don't like playing video games at all
+noGames/nrow(video_df)
+#instances of "relax" reason for playing video games
+relax <- as.double(table(video_multiple_df$relax[video_multiple_df$relax==1]))
+#instances of "grahics" reason for playing video games
+graphics <- as.double(table(video_multiple_df$graphic[video_multiple_df$graphic==1]))
+#instances of "master" reason for playing video games
+master <- as.double(table(video_multiple_df$master[video_multiple_df$master==1]))
+#instances of "bored" reason for playing video games
+bored <- as.double(table(video_multiple_df$bored[video_multiple_df$bored==1]))
+#instances of "challenge" reason for playing video games
+challenge <- as.double(table(video_multiple_df$challenge[video_multiple_df$challenge==1]))
+#instances of "coordination" reason for playing video games
+coord <- as.double(table(video_multiple_df$coord[video_multiple_df$coord==1]))
+#creates vector of each reason instance
+reasons <- c(relax,graphics,master,bored,challenge,coord)
+#attaches reason name to each instance sum
+names(reasons) <- c("relax","graphics","master","bored","challenge","coord")
+#sorted display of the reasons and summed instances
+sort(reasons, decreasing = TRUE)
+
+#Below we see find the most prominent reasons why students don't like vdgm.'s
+#instances of "time" reason for not playing video games
+time <- as.double(table(video_multiple_df$time[video_multiple_df$time==1]))
+#instances of "frust" reason for playing video games
+frust <- as.double(table(video_multiple_df$frust[video_multiple_df$frust==1]))
+#instances of "lonely" reason for playing video games
+lonely <- as.double(table(video_multiple_df$lonely[video_multiple_df$lonely==1]))
+#instances of "rules" reason for playing video games
+rules <- as.double(table(video_multiple_df$rules[video_multiple_df$rules==1]))
+#instances of "cost" reason for playing video games
+cost <- as.double(table(video_multiple_df$cost[video_multiple_df$cost==1]))
+#instances of "boring" reason for playing video games
+boring <- as.double(table(video_multiple_df$boring[video_multiple_df$boring==1]))
+#instances of "friends don't play" reason for playing video games
+friends <- as.double(table(video_multiple_df$friends[video_multiple_df$friends==1]))
+#instances of "pointless" reason for playing video games
+pointless <- as.double(table(video_multiple_df$point[video_multiple_df$point==1]))
+
+
+#creates vector of each dislike reason instance
+dislikeReasons <- c(time,frust,lonely,rules,cost,boring, friends,pointless)
+#attaches reason name to each instance sum
+names(dislikeReasons) <- c("time","frust","lonely","rules","cost","boring","friends","pointless")
+#sorted display of the reasons and summed instances
+sort(dislikeReasons, decreasing = TRUE)
+```
+
+
+```{r}
+#scenario 5
+#setup
+merged = cbind(video_df, video_multiple_df)
+merged['likesGames'] = rep(NA, nrow(merged))
+merged$likesGames[merged$like %in% c(1,5)] = 0
+merged$likesGames[merged$like %in% c(2,3,4)] = 1
+merged['works'] = rep(NA, nrow(merged))
+merged$works[merged$work > 0]  = 1
+merged$works[merged$work == 0] = 0
+game.types = c('action','adv','sim','sport','strategy')
+for (type in game.types) {
+  merged[,type] = as.numeric(merged[,type])
+}
+#1. who doesn't like games?
+#men vs women
+samp1 = merged[,c('sex','likesGames')]
+agg1 = aggregate(samp1, by=list(samp1$likesGames,samp1$sex), FUN=length)
+groups1 = c('dislike, female','like, female','dislike, male','like, male')
+barplot(agg1$sex, names.arg = groups1,main='likes vs dislikes VGs, male vs female',col = c('red','red','blue','blue'))
+abline(h=c(10,20,30,40))
+barplot(agg1$sex, names.arg = groups1,col = c('red','red','blue','blue'),add=T)
+#work vs not work
+samp2 = merged[,c('works','likesGames')]
+agg2 = aggregate(samp2, by=list(samp2$likesGames,samp2$works), FUN=length)
+groups2 = c('dislike, no work','like, no work','dislike, work','like, work')
+barplot(agg2$works, names.arg = groups2,main='likes vs dislikes VGs, work vs no work',col = c('red','red','blue','blue'))
+abline(h=c(10,20,30,40))
+barplot(agg2$works, names.arg = groups2,col = c('red','red','blue','blue'),add=T)
+#owns vs not own
+samp3 = merged[,c('own','likesGames')]
+agg3 = aggregate(samp3, by=list(samp3$likesGames,samp3$own), FUN=length)
+groups3 = c('dislike, no PC','like, no PC','dislike, owns PC','like, owns PC')
+barplot(agg3$own, names.arg = groups3,main='likes vs dislikes VGs, PC vs no PC',col = c('red','red','blue','blue'))
+abline(h=c(10,20,30,40,50,60))
+barplot(agg3$own, names.arg = groups3,col = c('red','red','blue','blue'),add=T)
+
+```
+
+
+```{r}
+#part 2????
+#Creating regression tree for "likesGame" (requires "rpart" and "rpart.plot" packages)
+library(rpart)
+library(rpart.plot)
+#creates variable "likesGame" which equals 1 if "like" != 1 or 5, 0 else (NA's remain) 
+merged['likesGame'] <- rep(NA, dim(video_df)[1])
+for(i in 1:dim(video_df)[1]){
+  like <- merged[i, 'like']
+  if(like==0 & !is.na(like) || like==5 & !is.na(like)){
+    merged[i, 'likesGame'] = 0
+  }else if(is.na(like)){
+    merged[i, 'likesGame'] = NA
+  }else{
+    merged[i, 'likesGame'] = 1
+  }
+}
+#create variable "works" where value of 1 indicates student worked during that week, 0 otherwise
+merged$works <- ifelse(merged$work>0,1,0)
+#Creating regression tree for "likesGame" (requires "rpart" and "rpart.plot" packages)
+merged.tree <- rpart(likesGame~action+works+sex+adv+sim+sport+strategy, data=merged,method = "anova",control = rpart.control(minsplit = 10,cp=0.01))
+rpart.plot(merged.tree)
+
+```
+
+
+
+```{r}
+#SCENARIO 6
+#split into not played (5 and 1)
+not_liked = video_df[video_df$like == 1 | video_df$like == 5,]
+#split into played (2, 3, 4)
+liked = video_df[video_df$like==2|video_df$like==2|video_df$like==3,]
+barplot(table(not_liked$grade),names.arg=c('C','B','A'),col = c('red','blue','green') ,main= 'Distribution of Grades - Not Liked', border=TRUE,
+        xlab='Grade Expected', ylab='count')
+barplot(table(liked$grade),names.arg=c('C','B','A'),col = c('red','blue','green') ,main= 'Distribution of Grades - Liked', border=TRUE,
+        xlab='Grade Expected', ylab='count')
+
+```
+
+```{r}
+#INDEP SCENARIO
+educ1 = video_df[video_df$educ==1,]
+educ0 = video_df[video_df$educ==0,]
+   
+barplot(table(educ0$grade),names.arg=c('C','B','A'),col = c('red','blue','green') ,main= 'Distribution of Grades - Not Educational', border=TRUE,
+        xlab='Grade Expected', ylab='count')
+barplot(table(educ1$grade),names.arg=c('C','B','A'),col = c('red','blue','green') ,main= 'Distribution of Grades - Educational', border=TRUE,
+        xlab='Grade Expected', ylab='count')
+
+```
