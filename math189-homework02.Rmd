@@ -274,6 +274,17 @@ int.point <- c(mean.point - widthPoint, mean.point + widthPoint)
 mean.point
 int.point
 
+#adds likesGame varible from video_df to video_multiple_df
+video_multiple_df['likesVideoGames'] <- video_df$likesGame
+#below require "rpart" and "rpart.plot" packages
+#reg tree for reasons (with mean > 0.10) why students like games
+likesVideoGames.tree <- rpart(likesVideoGames~relax+graphic+master+bored+challenge, data=video_multiple_df,method = "anova",control = rpart.control(minsplit = 3,cp=0.001))
+rpart.plot(likesVideoGames.tree)
+#reg tree for reasons (with mean > 0.10) why students don't like games
+doesNotlikeVideoGames.tree <- rpart(likesVideoGames~time+cost+point+boring+rules+frust, data=video_multiple_df,method = "anova",control = rpart.control(minsplit = 10,cp=0.001))
+rpart.plot(doesNotlikeVideoGames.tree)
+
+
 #Below is contsruction of regression tree (moved to scenario 5)
 #create variable "works" where value of 1 indicates student worked during that week, 0 otherwise
 #video_df$works <- ifelse(video_df$work>0,1,0)
