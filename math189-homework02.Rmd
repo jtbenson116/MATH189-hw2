@@ -137,12 +137,25 @@ time.int.boot
 
 ```{r}
 #SCENARIO 4
-#creates table for like varible
-likeAlone <- table(video_df$like)
-#Below adds instances where like = 1 or 5
-noGames <- as.double(likeAlone[1]+likeAlone[5])
-#portion of surveyees who never played/don't like playing video games at all
-noGames/nrow(video_df)
+#creates variable "likesGame" which equals 1 if "like" != 1 or 5, 0 else (NA's remain) 
+video_df['likesGame'] <- rep(NA, dim(video_df)[1])
+for(i in 1:dim(video_df)[1]){
+  like <- video_df[i, 'like']
+  if(like==0 & !is.na(like) || like==5 & !is.na(like)){
+    video_df[i, 'likesGame'] = 0
+  }else if(is.na(like)){
+    video_df[i, 'likesGame'] = NA
+  }else{
+    video_df[i, 'likesGame'] = 1
+  }
+}
+#Finds mean of likesGames, indicating portion of students that at least somewhat like videogames
+mean.likesGame <- mean(video_df$likesGame, na.rm = TRUE)
+mean.likesGame
+#Confidence interval for discrete var "likesGames" with finite population correction
+width <- 1.96 * sqrt(mean.likesGame*(1-mean.likesGame)*(314-91)/((91-1)*314))
+int.likesGame <- c(mean.likesGame - width, mean.likesGame + width)
+int.likesGame
 #instances of "relax" reason for playing video games
 relax <- as.double(table(video_multiple_df$relax[video_multiple_df$relax==1]))
 #instances of "grahics" reason for playing video games
@@ -179,14 +192,20 @@ boring <- as.double(table(video_multiple_df$boring[video_multiple_df$boring==1])
 friends <- as.double(table(video_multiple_df$friends[video_multiple_df$friends==1]))
 #instances of "pointless" reason for playing video games
 pointless <- as.double(table(video_multiple_df$point[video_multiple_df$point==1]))
-
-
 #creates vector of each dislike reason instance
 dislikeReasons <- c(time,frust,lonely,rules,cost,boring, friends,pointless)
 #attaches reason name to each instance sum
 names(dislikeReasons) <- c("time","frust","lonely","rules","cost","boring","friends","pointless")
 #sorted display of the reasons and summed instances
 sort(dislikeReasons, decreasing = TRUE)
+
+#Below is contsruction of regression tree (moved to scenario 5)
+#create variable "works" where value of 1 indicates student worked during that week, 0 otherwise
+#video_df$works <- ifelse(video_df$work>0,1,0)
+#Creating regression tree for "likesGame" (requires "rpart" and "rpart.plot" packages)
+#video_df.tree <- rpart(likesGame~grade+sex+educ+math+works, data=video_df,method = "anova",control = rpart.control(minsplit = 10,cp=0.01))
+#rpart.plot(video_df.tree)
+
 ```
 
 ```{r}
