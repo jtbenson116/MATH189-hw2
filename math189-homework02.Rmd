@@ -247,6 +247,39 @@ names(reasons) <- c("relax","graphics","master","bored","challenge","coord")
 #sorted display of the reasons and summed instances
 sort(reasons, decreasing = TRUE)
 
+#Calculate mean of each discrete (binary) variable of interest
+mean.relax <- mean(as.numeric(video_multiple_df$relax), na.rm = TRUE)
+mean.graphic <- mean(as.numeric(video_multiple_df$graphic), na.rm = TRUE)
+mean.master <- mean(as.numeric(video_multiple_df$master), na.rm = TRUE)
+mean.bored <- mean(as.numeric(video_multiple_df$bored), na.rm = TRUE)
+mean.challenge <- mean(as.numeric(video_multiple_df$challenge), na.rm = TRUE)
+mean.coord <- mean(as.numeric(video_multiple_df$coord), na.rm = TRUE)
+#Confidence intervals for above discrete vars  with finite population correction, adjusted for NAs:91->87
+widthRelax <- 1.96 * sqrt(mean.relax*(1-mean.relax)*(314-87)/((87-1)*314))
+int.relax <- c(mean.relax - widthRelax, mean.relax + widthRelax)
+mean.relax
+int.relax
+widthGraphic <- 1.96 * sqrt(mean.graphic*(1-mean.graphic)*(314-87)/((87-1)*314))
+int.graphic <- c(mean.graphic - widthGraphic, mean.graphic + widthGraphic)
+mean.graphic
+int.graphic
+widthMaster <- 1.96 * sqrt(mean.master*(1-mean.master)*(314-87)/((87-1)*314))
+int.master <- c(mean.master - widthMaster, mean.master + widthMaster)
+mean.master
+int.master
+widthBored <- 1.96 * sqrt(mean.bored*(1-mean.bored)*(314-87)/((87-1)*314))
+int.bored <- c(mean.bored - widthBored, mean.bored + widthBored)
+mean.bored
+int.bored
+widthChallenge <- 1.96 * sqrt(mean.challenge*(1-mean.challenge)*(314-87)/((87-1)*314))
+int.challenge <- c(mean.challenge - widthChallenge, mean.challenge + widthChallenge)
+mean.challenge
+int.challenge
+widthCoord <- 1.96 * sqrt(mean.coord*(1-mean.coord)*(314-87)/((87-1)*314))
+int.coord <- c(mean.coord - widthCoord, mean.coord + widthCoord)
+mean.coord
+int.coord
+
 #Below we see find the most prominent reasons why students don't like vdgm.'s
 #instances of "time" reason for not playing video games
 time <- as.double(table(video_multiple_df$time[video_multiple_df$time==1]))
@@ -270,6 +303,48 @@ dislikeReasons <- c(time,frust,lonely,rules,cost,boring, friends,pointless)
 names(dislikeReasons) <- c("time","frust","lonely","rules","cost","boring","friends","pointless")
 #sorted display of the reasons and summed instances
 sort(dislikeReasons, decreasing = TRUE)
+#Calculate mean of each discrete (binary) variable of interest
+mean.time <- mean(as.numeric(video_multiple_df$time), na.rm = TRUE)
+mean.frust <- mean(as.numeric(video_multiple_df$frust), na.rm = TRUE)
+mean.lonely <- mean(as.numeric(video_multiple_df$lonely), na.rm = TRUE)
+mean.rules <- mean(as.numeric(video_multiple_df$rules), na.rm = TRUE)
+mean.cost <- mean(as.numeric(video_multiple_df$cost), na.rm = TRUE)
+mean.boring <- mean(as.numeric(video_multiple_df$boring), na.rm = TRUE)
+mean.friends <- mean(as.numeric(video_multiple_df$friends), na.rm = TRUE)
+mean.point <- mean(as.numeric(video_multiple_df$point), na.rm = TRUE)
+#Confidence intervals for above discrete vars  with finite population correction
+widthTime <- 1.96 * sqrt(mean.time*(1-mean.time)*(314-91)/((91-1)*314))
+int.time <- c(mean.time - widthTime, mean.time + widthTime)
+mean.time
+int.time
+widthFrust <- 1.96 * sqrt(mean.frust*(1-mean.frust)*(314-91)/((91-1)*314))
+int.frust <- c(mean.frust - widthFrust, mean.frust + widthFrust)
+mean.frust
+int.frust
+widthLonely <- 1.96 * sqrt(mean.lonely*(1-mean.lonely)*(314-91)/((91-1)*314))
+int.lonely <- c(mean.lonely - widthLonely, mean.lonely + widthLonely)
+mean.lonely
+int.lonely
+widthRules <- 1.96 * sqrt(mean.rules*(1-mean.rules)*(314-91)/((91-1)*314))
+int.rules <- c(mean.rules - widthRules, mean.rules + widthRules)
+mean.rules
+int.rules
+widthCost <- 1.96 * sqrt(mean.cost*(1-mean.cost)*(314-91)/((91-1)*314))
+int.cost <- c(mean.cost - widthCost, mean.cost + widthCost)
+mean.cost
+int.cost
+widthBoring <- 1.96 * sqrt(mean.boring*(1-mean.boring)*(314-91)/((91-1)*314))
+int.boring <- c(mean.boring - widthBoring, mean.boring + widthBoring)
+mean.boring
+int.boring
+widthFriends <- 1.96 * sqrt(mean.friends*(1-mean.friends)*(314-91)/((91-1)*314))
+int.friends <- c(mean.friends - widthFriends, mean.friends + widthFriends)
+mean.friends
+int.friends
+widthPoint <- 1.96 * sqrt(mean.point*(1-mean.point)*(314-91)/((91-1)*314))
+int.point <- c(mean.point - widthPoint, mean.point + widthPoint)
+mean.point
+int.point
 
 #Below is contsruction of regression tree (moved to scenario 5)
 #create variable "works" where value of 1 indicates student worked during that week, 0 otherwise
