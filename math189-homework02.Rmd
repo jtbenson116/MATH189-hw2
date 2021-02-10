@@ -76,7 +76,7 @@ boot.played.videogames.ci <- c(bootstrap.mean - 1.96*boot.played.videogames.sd, 
 boot.played.videogames.ci
 
 # 0.025-quantile and 0.975 quantile of the bootstrap sample means (Interval Estimate)
-boot.played.videogames.qqi <- c(quantile(bootstrap.mean, 0.025), quantile(bootstrap.mean, 0.975))
+boot.played.videogames.qqi <- c(quantile(boot.played.videogames.mean, 0.025), quantile(bootstrap.mean, 0.975))
 boot.played.videogames.qqi
 
 # Check Normality by  Kolmogorov-Smirnov test [Lab 3]
