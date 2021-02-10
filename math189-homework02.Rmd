@@ -11,6 +11,10 @@ video_df <- read.csv('data/video_fixed.csv')
 # removes the last row (all NA values)
 video_df <- video_df[-nrow(video_df),]
 video_df
+
+#Creating regression tree for "likesGame" (requires "rpart" and "rpart.plot" packages)
+library(rpart)
+library(rpart.plot)
 ```
 ```{r}
 # Clean video multiple df
@@ -55,9 +59,9 @@ boot.played.videogames <- played.videogames[ind.boot]
 B <- 2000
 boot.played.videogames.mean <- rep(NA, B)
 for(i in 1:B) {
-        ind <- sample.int(N, size=n, replace=TRUE)
-        boot <- boot.played.videogames[ind]
-        boot.played.videogames.mean[i] <- mean(boot)
+  ind <- sample.int(N, size=n, replace=TRUE)
+  boot <- boot.played.videogames[ind]
+  boot.played.videogames.mean[i] <- mean(boot)
 }
 
 
@@ -162,11 +166,11 @@ dev.off()
 
 #Bar plot showing mean hours of games played grouped by frequency
 time.means.by.freq <- matrix(c(
-        mean(video_df$time[video_df$freq==1], na.rm=TRUE),
-        mean(video_df$time[video_df$freq==2], na.rm=TRUE),
-        mean(video_df$time[video_df$freq==3], na.rm=TRUE),
-        mean(video_df$time[video_df$freq==4], na.rm=TRUE)),
-        ncol=4,byrow=TRUE)
+  mean(video_df$time[video_df$freq==1], na.rm=TRUE),
+  mean(video_df$time[video_df$freq==2], na.rm=TRUE),
+  mean(video_df$time[video_df$freq==3], na.rm=TRUE),
+  mean(video_df$time[video_df$freq==4], na.rm=TRUE)),
+  ncol=4,byrow=TRUE)
 colnames(time.means.by.freq) <- c("Daily", "Weekly", "Monthly", "Semesterly")
 rownames(time.means.by.freq) <- c("Mean Time Played")
 time.means.by.freq <- as.table(time.means.by.freq)
@@ -393,7 +397,7 @@ game.types = c('action','adv','sim','sport','strategy')
 for (type in game.types) {
   merged[,type] = as.numeric(merged[,type])
 }
-#1. who doesn't like games?
+#who doesn't like games?
 #men vs women
 samp1 = merged[,c('sex','likesGames')]
 agg1 = aggregate(samp1, by=list(samp1$likesGames,samp1$sex), FUN=length)
@@ -416,9 +420,6 @@ barplot(agg3$own, names.arg = groups3,main='likes vs dislikes VGs, PC vs no PC',
 abline(h=c(10,20,30,40,50,60))
 barplot(agg3$own, names.arg = groups3,col = c('red','red','blue','blue'),add=T)
 
-#Creating regression tree for "likesGame" (requires "rpart" and "rpart.plot" packages)
-library(rpart)
-library(rpart.plot)
 #creates variable "likesGame" which equals 1 if "like" != 1 or 5, 0 else (NA's remain) 
 merged['likesGame'] <- rep(NA, dim(video_df)[1])
 for(i in 1:dim(video_df)[1]){
