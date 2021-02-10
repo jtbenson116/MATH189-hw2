@@ -377,9 +377,10 @@ rpart.plot(doesNotlikeVideoGames.tree)
 #Creating regression tree for "likesGame" (requires "rpart" and "rpart.plot" packages)
 #video_df.tree <- rpart(likesGame~grade+sex+educ+math+works, data=video_df,method = "anova",control = rpart.control(minsplit = 10,cp=0.01))
 #rpart.plot(video_df.tree)
+```
 
-```
-```
+
+```{r}
 #scenario 5
 merged = cbind(video_df, video_multiple_df)
 merged['likesGames'] = rep(NA, nrow(merged))
@@ -432,7 +433,6 @@ for(i in 1:dim(video_df)[1]){
 }
 #create variable "works" where value of 1 indicates student worked during that week, 0 otherwise
 merged$works <- ifelse(merged$work>0,1,0)
-#Creating regression tree for "likesGame" (requires "rpart" and "rpart.plot" packages)
 merged.tree <- rpart(likesGame~action+works+sex+adv+sim+sport+strategy, data=merged,method = "anova",control = rpart.control(minsplit = 10,cp=0.01))
 rpart.plot(merged.tree)
 ```
