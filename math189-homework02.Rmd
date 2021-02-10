@@ -99,6 +99,20 @@ qqnorm(boot.played.videogames.mean, main="Bootstrap Mean Normal QQ Plot")
 qqline(boot.played.videogames.mean)
 dev.copy(png,'graphs/scen1qqline.png')
 dev.off()
+#jackknife
+jack.means = rep(NA, n)
+for (i in seq(1,n,1)) {
+  jack.means[i] = mean(played.videogames[-i])
+}
+jack.mu = mean(jack.means)
+jack.sd = sd(jack.means)
+jack.int = c(jack.mu - 1.96*jack.sd, jack.mu + 1.96*jack.sd)
+#histogram of jackknife CI on sample data
+hist(played.videogames, main='jackknife 95% confidence interval on sample data')
+abline(v=c(jack.int[1],jack.int[2]),lwd=2,col=c('red','blue'))
+#histogram of bootstrap CI on sample data
+hist(played.videogames, main='bootstrap 95% confidence interval on sample data')
+abline(v=c(boot.played.videogames.ci[1],boot.played.videogames.ci[2]),lwd=2,col=c('red','blue'))
 ```
 
 
@@ -354,6 +368,64 @@ int.point
 #rpart.plot(video_df.tree)
 
 ```
+```
+#scenario 5
+merged = cbind(video_df, video_multiple_df)
+merged['likesGames'] = rep(NA, nrow(merged))
+merged$likesGames[merged$like %in% c(1,5)] = 0
+merged$likesGames[merged$like %in% c(2,3,4)] = 1
+merged['works'] = rep(NA, nrow(merged))
+merged$works[merged$work > 0]  = 1
+merged$works[merged$work == 0] = 0
+game.types = c('action','adv','sim','sport','strategy')
+for (type in game.types) {
+  merged[,type] = as.numeric(merged[,type])
+}
+#1. who doesn't like games?
+#men vs women
+samp1 = merged[,c('sex','likesGames')]
+agg1 = aggregate(samp1, by=list(samp1$likesGames,samp1$sex), FUN=length)
+groups1 = c('dislike, female','like, female','dislike, male','like, male')
+barplot(agg1$sex, names.arg = groups1,main='likes vs dislikes VGs, male vs female',col = c('red','red','blue','blue'))
+abline(h=c(10,20,30,40))
+barplot(agg1$sex, names.arg = groups1,col = c('red','red','blue','blue'),add=T)
+#work vs not work
+samp2 = merged[,c('works','likesGames')]
+agg2 = aggregate(samp2, by=list(samp2$likesGames,samp2$works), FUN=length)
+groups2 = c('dislike, no work','like, no work','dislike, work','like, work')
+barplot(agg2$works, names.arg = groups2,main='likes vs dislikes VGs, work vs no work',col = c('red','red','blue','blue'))
+abline(h=c(10,20,30,40))
+barplot(agg2$works, names.arg = groups2,col = c('red','red','blue','blue'),add=T)
+#owns vs not own
+samp3 = merged[,c('own','likesGames')]
+agg3 = aggregate(samp3, by=list(samp3$likesGames,samp3$own), FUN=length)
+groups3 = c('dislike, no PC','like, no PC','dislike, owns PC','like, owns PC')
+barplot(agg3$own, names.arg = groups3,main='likes vs dislikes VGs, PC vs no PC',col = c('red','red','blue','blue'))
+abline(h=c(10,20,30,40,50,60))
+barplot(agg3$own, names.arg = groups3,col = c('red','red','blue','blue'),add=T)
+
+#Creating regression tree for "likesGame" (requires "rpart" and "rpart.plot" packages)
+library(rpart)
+library(rpart.plot)
+#creates variable "likesGame" which equals 1 if "like" != 1 or 5, 0 else (NA's remain) 
+merged['likesGame'] <- rep(NA, dim(video_df)[1])
+for(i in 1:dim(video_df)[1]){
+  like <- merged[i, 'like']
+  if(like==0 & !is.na(like) || like==5 & !is.na(like)){
+    merged[i, 'likesGame'] = 0
+  }else if(is.na(like)){
+    merged[i, 'likesGame'] = NA
+  }else{
+    merged[i, 'likesGame'] = 1
+  }
+}
+#create variable "works" where value of 1 indicates student worked during that week, 0 otherwise
+merged$works <- ifelse(merged$work>0,1,0)
+#Creating regression tree for "likesGame" (requires "rpart" and "rpart.plot" packages)
+merged.tree <- rpart(likesGame~action+works+sex+adv+sim+sport+strategy, data=merged,method = "anova",control = rpart.control(minsplit = 10,cp=0.01))
+rpart.plot(merged.tree)
+```
+
 
 ```{r}
 #SCENARIO 6
