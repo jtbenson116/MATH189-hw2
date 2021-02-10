@@ -389,6 +389,7 @@ merged$likesGames[merged$like %in% c(2,3,4)] = 1
 merged['works'] = rep(NA, nrow(merged))
 merged$works[merged$work > 0]  = 1
 merged$works[merged$work == 0] = 0
+
 game.types = c('action','adv','sim','sport','strategy')
 for (type in game.types) {
   merged[,type] = as.numeric(merged[,type])
@@ -433,7 +434,7 @@ for(i in 1:dim(video_df)[1]){
 }
 #create variable "works" where value of 1 indicates student worked during that week, 0 otherwise
 merged$works <- ifelse(merged$work>0,1,0)
-merged.tree <- rpart(likesGame~action+works+sex+adv+sim+sport+strategy, data=merged,method = "anova",control = rpart.control(minsplit = 10,cp=0.01))
+merged.tree <- rpart(likesGame~relax+coord+challenge+master+sex+works+own+cost+bored, data=merged,method = "anova",control = rpart.control(minsplit = 2,cp=0.01))
 rpart.plot(merged.tree)
 ```
 
