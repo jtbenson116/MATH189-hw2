@@ -108,11 +108,10 @@ jack.mu = mean(jack.means)
 jack.sd = sd(jack.means)
 jack.int = c(jack.mu - 1.96*jack.sd, jack.mu + 1.96*jack.sd)
 #histogram of jackknife CI on sample data
-hist(played.videogames, main='jackknife 95% confidence interval on sample data')
-abline(v=c(jack.int[1],jack.int[2]),lwd=2,col=c('red','blue'))
-#histogram of bootstrap CI on sample data
-hist(played.videogames, main='bootstrap 95% confidence interval on sample data')
-abline(v=c(boot.played.videogames.ci[1],boot.played.videogames.ci[2]),lwd=2,col=c('red','blue'))
+hist(played.videogames, main='boostrap/jackknife 95% confidence interval on sample data')
+abline(v=c(boot.played.videogames.ci[1],boot.played.videogames.ci[2]),lwd=2,col=c('red'))
+abline(v=c(jack.int[1], jack.int[2]), lwd=2, col='blue')
+legend("topright", c('bootstrap','jackknife'), col=c('red','blue'),lwd=6)
 ```
 
 
